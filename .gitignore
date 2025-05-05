@@ -1,49 +1,47 @@
-﻿# Node modules
+﻿# 忽略 Node.js 依赖
 node_modules/
 
-# Build output
+# 构建输出目录
 dist/
 out/
 
-# Logs
+# 临时缓存和日志
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# 锁文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# VSCode project settings
-.vscode/
-
-# Environment files
+# 环境变量文件
 .env
 .env.*
 
-# Compiled binary or executable files (like Electron)
+# 编译产生的可执行文件（如 electron.exe）
 *.exe
 *.dll
 *.so
 *.dylib
 
-# Git LFS pointer files (optional, if using Git LFS)
-*.zip
-*.tar.gz
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
 
-# Git-related
-.git/
+# VSCode 工作区设置
+.vscode/
 
-# Mac系统元文件
+# macOS 系统元数据
 .AppleDouble
 .LSOverride
 
-# Windows缩略图
-ehthumbs.db
-Icon?
+# 可选：压缩包（如有 LFS 可以取消注释）
+# *.zip
+# *.tar.gz
+
+# Git 自身文件（预防性，不会被上传）
+.git/
