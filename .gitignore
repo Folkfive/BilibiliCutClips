@@ -1,0 +1,49 @@
+﻿# Node modules
+node_modules/
+
+# Build output
+dist/
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VSCode project settings
+.vscode/
+
+# Environment files
+.env
+.env.*
+
+# Compiled binary or executable files (like Electron)
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Git LFS pointer files (optional, if using Git LFS)
+*.zip
+*.tar.gz
+
+# Git-related
+.git/
+
+# Mac系统元文件
+.AppleDouble
+.LSOverride
+
+# Windows缩略图
+ehthumbs.db
+Icon?

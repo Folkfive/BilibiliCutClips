@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B站直播切片工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- 添加HLS.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- 添加flv.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 标题栏 -->
+        <header class="title-bar">
+            <div class="logo">
+                <i class="fab fa-bilibili"></i> B站直播切片工具
+            </div>
+            <div class="window-controls">
+                <button class="control-btn settings-btn"><i class="fas fa-cog"></i></button>
+                <button class="control-btn minimize-btn"><i class="far fa-window-minimize"></i></button>
+                <button class="control-btn maximize-btn"><i class="far fa-window-maximize"></i></button>
+                <button class="control-btn close-btn"><i class="fas fa-times"></i></button>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 左侧边栏 -->
+            <aside class="sidebar">
+                <div class="live-source-section">
+                    <h3>直播源</h3>
+                    <div class="input-group">
+                        <input type="text" placeholder="输入直播间URL或房间号">
+                        <button class="go-btn">Go</button>
+                    </div>
+                </div>
+
+                <nav class="tabs">
+                    <button class="tab-button active" data-tab="preview"><i class="fas fa-tv"></i> 预览</button>
+                    <button class="tab-button" data-tab="clips"><i class="fas fa-list-ul"></i> 切片列表</button>
+                    <button class="tab-button" data-tab="settings-panel"><i class="fas fa-sliders-h"></i> 设置</button>
+                </nav>
+
+                <div class="recent-clips-section">
+                    <h4><i class="fas fa-history"></i> 最近切片</h4>
+                    <ul class="clip-list">
+                        <li>
+                            <span>切片1_精彩瞬间.mp4</span>
+                            <div class="clip-actions">
+                                <button title="预览"><i class="fas fa-play-circle"></i></button>
+                                <button title="导出"><i class="fas fa-download"></i></button>
+                                <button title="删除"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </li>
+                        <li>
+                            <span>切片2_高能时刻.mp4</span>
+                            <div class="clip-actions">
+                                <button title="预览"><i class="fas fa-play-circle"></i></button>
+                                <button title="导出"><i class="fas fa-download"></i></button>
+                                <button title="删除"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </li>
+                        <!-- 更多切片... -->
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- 右侧内容区 -->
+            <section class="content-area">
+                <div id="preview" class="tab-content active">
+                    <div class="video-placeholder">
+                        <p>直播画面预览区域</p>
+                        <p>(等待加载直播源...)</p>
+                    </div>
+                    <!-- 新增：直播回溯与实时切片控制 -->
+                    <div class="live-timeshift-controls">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <h4 style="margin: 0;"><i class="fas fa-undo-alt"></i> 直播回溯与切割</h4>
+                            <button class="action-btn mini-btn" id="back-to-live-btn" title="返回当前直播"><i class="fas fa-broadcast-tower"></i> 返回当前直播</button>
+                        </div>
+                        <div class="timeline-container">
+                            <div class="timeline-labels">
+                                <span>00:00</span> <!-- Keep as 00:00 -->
+                                <span>实时</span> <!-- Changed from 05:00 to 实时 -->
+                            </div>
+                            <div class="timeline-track">
+                                <div class="selection-area"></div>
+                                <div class="selection-handle start"></div>
+                                <div class="selection-handle end"></div>
+                            </div>
+                            <div class="timeline-info">
+                                <span id="selected-duration-label">选中时长: 0s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 直播回溯与实时切片控制结束 -->
+                    
+                    <!-- 弹幕设置控件 -->
+                    <div class="danmaku-settings">
+                        <h4><i class="fas fa-comment-dots"></i> 弹幕设置</h4>
+                        <div class="settings-controls">
+                            <div class="setting-row">
+                                <label>
+                                    <input type="checkbox" id="danmaku-toggle" checked>
+                                    显示弹幕
+                                </label>
+                                <div class="slider-group">
+                                    <label for="opacity-slider">透明度:</label>
+                                    <input type="range" id="opacity-slider" min="0" max="100" value="80" class="slider">
+                                    <span class="slider-value">80%</span>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="slider-group">
+                                    <label for="font-size-slider">字体大小:</label>
+                                    <input type="range" id="font-size-slider" min="12" max="36" value="22" class="slider">
+                                    <span class="slider-value">22px</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label for="speed-slider">滚动时间:</label>
+                                    <input type="range" id="speed-slider" min="1" max="15" value="8" class="slider">
+                                    <span class="slider-value">8s</span>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="select-group">
+                                    <label for="area-select">显示区域:</label>
+                                    <select id="area-select">
+                                        <option value="all" selected>全屏</option>
+                                        <option value="top">顶部</option>
+                                        <option value="middle">中部</option>
+                                        <option value="bottom">底部</option>
+                                    </select>
+                                </div>
+                                <button class="action-btn mini-btn" id="advanced-danmaku-settings"><i class="fas fa-cog"></i> 高级设置</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 弹幕设置控件结束 -->
+                </div>
+                <div class="sidebar">
+                    <div class="tab-content active" id="clips">
+                        <div class="recent-clips">
+                            <h3>最近切片 <button id="open-folder-btn" title="打开保存目录"><i class="fas fa-folder-open"></i></button></h3>
+                            <ul class="clip-list">
+                                <!-- Clips will be added here -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="settings-panel" class="tab-content">
+                        <p>设置面板内容...</p>
+                        <!-- 设置界面内容 -->
+                    </div>
+                </div>
+            </section>
+        </main>        <!-- 底部控制栏 -->
+        <footer class="bottom-controls">
+            <button class="action-btn"><i class="fas fa-cut"></i> 快速切片 (30s)</button>
+            <button class="action-btn"><i class="far fa-clock"></i> 定时切片</button>
+            <button class="action-btn"><i class="fas fa-sliders-h"></i> 自定义切片</button>
+            <span class="recording-status" style="display: none;"></span> <!-- 显示录制状态，默认隐藏 -->
+            <button class="action-btn stop-btn" style="display: none;"><i class="fas fa-stop-circle"></i> 停止录制</button>
+        </footer>
+
+        <!-- 状态栏 -->
+        <footer class="status-bar">
+            <span>状态: 就绪</span>
+            <span>存储路径: D:\Videos\BiliLiveClips</span>
+            <span>版本: v1.0.0</span>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
